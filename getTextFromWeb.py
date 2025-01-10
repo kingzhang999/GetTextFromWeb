@@ -73,7 +73,10 @@ def get_text_from_web(urls):
                 specific_text.remove(juan_number)  # 使只有第一章，第一页有标题。
                 has_text_title = True
             elif not is_first_page_connected_success:
-                specific_text.remove(juan_number)  # 使只有第一章，第一页有标题。
+                try:
+                    specific_text.remove(juan_number)# 使只有第一章，第一页有标题。
+                except ValueError:
+                    pass
                 has_text_title = True
             elif has_text_title:
                 specific_text.append(juan_number)
@@ -190,4 +193,21 @@ def main():
     print("\n" "Failed URLs:", failed_urls)
 
 if __name__ == '__main__':
-    main()
+    mode = input("请输入模式：1.默认链接 2.自定义新配置：")
+    if mode == '1':
+        main()
+    elif mode == '2':
+        novel_title = input("请输入小说名：")
+        juan_number = input("请输入卷名：")
+        global_text_title = input("请输入本卷第一章的标题：")
+        novel_code = int(input("请输入小说代码："))
+        first_zhangjie_number = int(input("请输入起始章节代码："))
+        last_zhangjie_number = int(input("请输入终止章节代码："))
+        zhangjie_change_interval = int(input("请输入章节切换间隔："))
+        #更新屏蔽列表
+        specific_text = ['上一章点赞目录+书签下一页', '上一章点赞目录+书签下一章', '上一页点赞目录+书签下一章',
+                         '上一页点赞目录+书签下一页',
+                         '轻之文库轻小说-懂阅读更懂创作的轻小说平台-发现和创造有趣的故事-日本动漫轻小说在线阅读',
+                         '当前位置:轻之文库轻小说-懂阅读更懂创作的轻小说平台-', juan_number]
+        main()
+#TODO:尝试将下载完毕的小说拼接起来。并且去除掉由于某些链接失效重新下载时所没能去掉的重复标题。

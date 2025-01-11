@@ -70,7 +70,10 @@ def get_text_from_web(urls):
         if not is_retying:
             global has_text_title
             if is_first_page and is_first_page_connected_success:
-                specific_text.remove(juan_number)  # 使只有第一章，第一页有标题。
+                try:
+                    specific_text.remove(juan_number)  # 使只有第一章，第一页有标题。
+                except ValueError:
+                    pass
                 has_text_title = True
             elif not is_first_page_connected_success:
                 try:
@@ -134,7 +137,10 @@ def start_requests(current_url,attempts=0):
             attempts += 1
 
     if attempts == max_attempts:
-        failed_urls[current_url] = (first_zhangjie_number, page_number)
+        if is_first_page:
+            failed_urls[current_url] = (first_zhangjie_number, 1)
+        else:
+            failed_urls[current_url] = (first_zhangjie_number, page_number)
         return False
     return True
 

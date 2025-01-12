@@ -2,16 +2,18 @@ import os
 
 import requests
 from bs4 import BeautifulSoup
+import merge_novel_txt_files as merge_txt
 
 
-novel_title = "败犬女主太多了第七卷"
-juan_number = "第七卷"
+novel_title = "樱花庄的宠物女孩短篇集"
+juan_number = "短篇"
 global_text_title = "第10.5卷 长谷栞奈突如其来的教育旅行"
-root_page_test_url = 'https://www.wenkuchina.com/lightnovel/3180/catalog'#'https://www.wenkuchina.com/lightnovel/2081/catalog'
-novel_code = 2081
+root_page_test_url = 'https://www.wenkuchina.com/lightnovel/2081/catalog' #'https://www.wenkuchina.com/lightnovel/3180/catalog'
+#novel_code = 2081
 first_zhangjie_number = 0#156997
 page_number = 2
 last_zhangjie_number = 157001
+novel_text_piece = 1
 is_first_get_novel_websites_root_page = True
 is_first_page = True
 is_last_page = False
@@ -39,9 +41,9 @@ def write_result_to_file(result, text_path):
     with open(text_path, 'a', encoding='utf-8') as f:
         f.write(result)
         if is_first_page:
-            print(f"{global_text_title} 第{first_zhangjie_number} 章 第1 页 已保存")
+            print(f"{novel_text_piece} {global_text_title} 第{first_zhangjie_number} 章 第1 页 已保存")
         else:
-            print(f"{global_text_title} 第{first_zhangjie_number} 章 第{page_number} 页 已保存")
+            print(f"{novel_text_piece} {global_text_title} 第{first_zhangjie_number} 章 第{page_number} 页 已保存")
 
 def is_special_text_in_line(line, specific_texts):
     for specific_text1 in specific_texts:
@@ -118,7 +120,7 @@ def get_text_from_web(urls):
 
         # 打印或处理获取到的文字内容
         #print(cleaned_text)
-        text_path = f'小说\\{novel_title}\\{global_text_title}{first_zhangjie_number}章1.txt' if is_first_page else f'小说\\{novel_title}\\{global_text_title}{first_zhangjie_number}章{page_number}.txt'
+        text_path = f'小说\\{novel_title}\\{novel_text_piece} {global_text_title}{first_zhangjie_number}章1.txt' if is_first_page else f'小说\\{novel_title}\\{novel_text_piece} {global_text_title}{first_zhangjie_number}章{page_number}.txt'
         write_result_to_file(cleaned_text, text_path)
         return
     else:
@@ -140,9 +142,9 @@ def start_requests(current_url, attempts=0):
 
     if attempts == max_attempts:
         if is_first_page:
-            failed_urls[current_url] = (first_zhangjie_number, 1)
+            failed_urls[current_url] = (first_zhangjie_number, 1,novel_text_piece)
         else:
-            failed_urls[current_url] = (first_zhangjie_number, page_number)
+            failed_urls[current_url] = (first_zhangjie_number, page_number,novel_text_piece)
         return False
     return True
 
@@ -153,6 +155,7 @@ def download_novel_easier(download_url: str):
     global first_zhangjie_number
     global page_number
     global last_zhangjie_number
+    global novel_text_piece
 
     while True:
         # 目标网站的URL
@@ -164,11 +167,13 @@ def download_novel_easier(download_url: str):
             else:
                 is_first_page_connected_success = True
             is_first_page = False
+            novel_text_piece += 1
 
         else:
             if not is_last_page:
                 start_requests(url)
                 page_number += 1
+                novel_text_piece += 1
             else:
                 if first_zhangjie_number == last_zhangjie_number:
                     break
@@ -184,27 +189,42 @@ def retry_failed_urls():
     global failed_urls
     global first_zhangjie_number
     global page_number
-    #global is_first_page
+    global novel_text_piece
 
     while failed_urls:
         is_retying = True
         url_page_pair = failed_urls.popitem()
         failed_url = url_page_pair[0]
+        first_zhangjie_number = url_page_pair[1][0]
         page_number = url_page_pair[1][1]
+        novel_text_piece = url_page_pair[1][2]
         # if url_page_pair[1][1] == 1:
         #     page_number = 2
         #     is_first_page = True
         # else:
         #     is_first_page = False
         #     page_number = url_page_pair[1][1]
-        first_zhangjie_number = url_page_pair[1][0]
         start_requests(failed_url)
         print(f"正重新尝试失败的链接... 剩余链接：{len(failed_urls)}")
 
-# def main():
-#     download_novel_easier()
-#     retry_failed_urls()
-#     print("\n" "Failed URLs:", failed_urls)
+def main():
+    global first_zhangjie_number
+    global last_zhangjie_number
+
+    urls_list = delete_pictures_url(get_novel_websites_root_page(root_page_test_url))
+    print(urls_list)
+    last_zhangjie_number = urls_list[-1][0].split('/')[5].split('.')[0]
+    for url_title_pair in urls_list:
+        first_zhangjie_number = url_title_pair[0].split('/')[5].split('.')[0]
+        download_novel_easier(url_title_pair[0])
+    retry_failed_urls()
+    print("下载完成！")
+
+    merge_mode = input("是否合并小说？（y/n）")
+    if merge_mode == 'y':
+        merge_novel()
+    else:
+        print("不合并小说！")
 
 def get_novel_websites_root_page(root_page_url):
     global is_first_get_novel_websites_root_page
@@ -243,13 +263,13 @@ def delete_pictures_url(url_list):
             url_list.remove(tup)
     return url_list
 
-if __name__ == '__main__':
+def merge_novel():
+    global novel_title
+    print(f"开始合并小说：{novel_title}")
+    target_path = f"小说\\{novel_title}"
+    output_path = f"小说\\{novel_title}\\{novel_title}.txt"
+    merge_txt.find_and_merge_txt_files(target_path, output_path)
+    print(f"合并完成！")
 
-    urls_list = delete_pictures_url(get_novel_websites_root_page(root_page_test_url))
-    print(urls_list)
-    last_zhangjie_number = urls_list[-1][0].split('/')[5].split('.')[0]
-    for url_title_pair in urls_list:
-        first_zhangjie_number = url_title_pair[0].split('/')[5].split('.')[0]
-        download_novel_easier(url_title_pair[0])
-    retry_failed_urls()
-    # novel_code = urls_list[0][0].split('/')[4]
+if __name__ == '__main__':
+    main()

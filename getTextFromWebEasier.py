@@ -3,12 +3,12 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import merge_novel_txt_files as merge_txt
+from removeRepetitionTitle import remove_repetition_title
 
-
-novel_title = "樱花庄的宠物女孩短篇集"
-juan_number = "短篇"
+novel_title = "义妹生活第十二卷"#"樱花庄的宠物女孩短篇集"
+juan_number = "第十二卷"#"短篇"
 global_text_title = "第10.5卷 长谷栞奈突如其来的教育旅行"
-root_page_test_url = 'https://www.wenkuchina.com/lightnovel/2081/catalog' #'https://www.wenkuchina.com/lightnovel/3180/catalog'
+root_page_test_url = 'https://www.wenkuchina.com/lightnovel/181/catalog' #'https://www.wenkuchina.com/lightnovel/3180/catalog'
 first_zhangjie_number = 0#156997
 page_number = 2
 last_zhangjie_number = 157001
@@ -221,7 +221,7 @@ def main():
 
     merge_mode = input("是否合并小说？（y/n）")
     if merge_mode == 'y':
-        merge_novel()
+        merge_novel_and_remove_repetition_title_of_novel()
     else:
         print("不合并小说！")
 
@@ -262,12 +262,16 @@ def delete_pictures_url(url_list):
             url_list.remove(tup)
     return url_list
 
-def merge_novel():
+def merge_novel_and_remove_repetition_title_of_novel():
     global novel_title
     print(f"开始合并小说：{novel_title}")
     target_path = f"小说\\{novel_title}"
-    output_path = f"小说\\{novel_title}\\{novel_title}.txt"
+    output_path = f"小说\\完整小说\\{novel_title}.txt"
     merge_txt.find_and_merge_txt_files(target_path, output_path)
+    #删除重复的标题
+    input_and_output_path = f"小说/完整小说"
+    remove_repetition_title(input_and_output_path)
+
     print(f"合并完成！")
 
 if __name__ == '__main__':

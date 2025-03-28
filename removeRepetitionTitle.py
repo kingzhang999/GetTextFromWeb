@@ -1,4 +1,5 @@
 import re
+import os
 
 def process_file(input_file, output_file):
     # 定义两个正则表达式
@@ -29,7 +30,6 @@ def process_file(input_file, output_file):
                     file.write(line)
             else:
                 file.write(line)
-import os
 
 def get_all_txt_files(folder_path: str) -> list[str]:
     """
@@ -50,6 +50,7 @@ def remove_repetition_title(folder_path: str):
     for file_path in txt_files:
         process_file(file_path, file_path)
         print(f"处理文件 {file_path} 完成")
+
 if __name__ == '__main__':
     folder_path = '小说/完整小说'  # 替换为实际的文件夹路径
     remove_repetition_title(folder_path)

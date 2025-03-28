@@ -56,7 +56,7 @@ def is_special_text_in_line(line, specific_texts):
 
 def get_text_from_web(urls):
     # 发送GET请求
-    response = requests.get(url=urls, headers=headers, timeout=3.5)
+    response = requests.get(url=urls, headers=headers, timeout=3.5, verify=False)
 
     # 检查请求是否成功
     if response.status_code == 200:
@@ -209,6 +209,8 @@ def retry_failed_urls():
 def main():
     global first_zhangjie_number
     global last_zhangjie_number
+    import urllib3
+    urllib3.disable_warnings()# 禁用警告信息
 
     urls_list = delete_pictures_url(get_novel_websites_root_page(root_page_test_url))
     print(urls_list)
@@ -231,7 +233,7 @@ def get_novel_websites_root_page(root_page_url):
         url_list = []
         can_start_collect = False
         # 发送GET请求
-        response = requests.get(url=root_page_url, headers=headers, timeout=3.5)
+        response = requests.get(url=root_page_url, headers=headers, timeout=3.5, verify=False)
 
         # 检查请求是否成功
         if response.status_code == 200:

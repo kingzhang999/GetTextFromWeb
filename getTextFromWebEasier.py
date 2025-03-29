@@ -1,14 +1,15 @@
 import os
+from time import sleep
 
 import requests
 from bs4 import BeautifulSoup
 import merge_novel_txt_files as merge_txt
 from removeRepetitionTitle import remove_repetition_title
 
-novel_title = "义妹生活第十二卷"#"樱花庄的宠物女孩短篇集"
-juan_number = "第十二卷"#"短篇"
+novel_title = "樱花庄的宠物女孩短篇集"#"义妹生活第十二卷"
+juan_number = "短篇"#"第十二卷"#
 global_text_title = "第10.5卷 长谷栞奈突如其来的教育旅行"
-root_page_test_url = 'https://www.wenkuchina.com/lightnovel/181/catalog' #'https://www.wenkuchina.com/lightnovel/3180/catalog'
+root_page_test_url = 'https://www.wenkuchina.com/lightnovel/2081/catalog' #'https://www.wenkuchina.com/lightnovel/3180/catalog'
 first_zhangjie_number = 0#156997
 page_number = 2
 last_zhangjie_number = 157001
@@ -240,7 +241,7 @@ def get_novel_websites_root_page(root_page_url):
             soup = BeautifulSoup(response.text, 'html.parser')
             text_list = [strs for strs in str(soup).splitlines()]
             for text_line in text_list:
-                if juan_number in text_line and is_first_get_novel_websites_root_page:
+                if juan_number in text_line and is_first_get_novel_websites_root_page:#匹配到对应的小说卷数，并且收集该卷数下相应的章节名和章节链接。
                     can_start_collect = True
                     is_first_get_novel_websites_root_page = False
                     continue
@@ -255,6 +256,7 @@ def get_novel_websites_root_page(root_page_url):
         else:
             print('Failed to retrieve the webpage')
     except requests.exceptions.Timeout:
+        sleep(0.2)
         get_novel_websites_root_page(root_page_url)
 
 

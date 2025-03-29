@@ -5,6 +5,7 @@ def process_file(input_file, output_file):
     # 定义两个正则表达式
     vol_pattern = re.compile(r'第.*卷\s+.*')
     article_pattern = re.compile(r'.*篇\s+.*')
+    article_pattern2 = re.compile(r'后记\s+.*')
 
     # 用于存储已经遇到的词汇
     seen_vols = set()
@@ -17,6 +18,7 @@ def process_file(input_file, output_file):
         for line in lines:
             vol_match = vol_pattern.search(line)
             article_match = article_pattern.search(line)
+            article_match2 = article_pattern2.search(line)
 
             if vol_match:
                 vol_text = vol_match.group()
@@ -27,6 +29,11 @@ def process_file(input_file, output_file):
                 article_text = article_match.group()
                 if article_text not in seen_articles:
                     seen_articles.add(article_text)
+                    file.write(line)
+            elif article_match2:
+                article_text2 = article_match2.group()
+                if article_text2 not in seen_articles:
+                    seen_articles.add(article_text2)
                     file.write(line)
             else:
                 file.write(line)

@@ -2,7 +2,7 @@ import re
 import os
 
 def process_file(input_file, output_file):
-    # 定义两个正则表达式
+    # 定义三个正则表达式
     vol_pattern = re.compile(r'第.*卷\s+.*')
     article_pattern = re.compile(r'.*篇\s+.*')
     article_pattern2 = re.compile(r'后记\s+.*')
